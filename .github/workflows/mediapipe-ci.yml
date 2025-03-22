@@ -1,0 +1,62 @@
+name: Setup Environment
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  setup:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Chocolatey
+        shell: powershell
+        run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force
+          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+          iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+      - name: Install Bazel 6.4.0
+        shell: powershell
+        run: |
+          choco install bazel --version 6.4.0 -y
+
+      - name: Install Python 3.12.0
+        shell: powershell
+        run: |
+          choco install python --version 3.12.0 -y
+
+      - name: Copy python.exe to python3.exe and add to PATH with highest priority
+        shell: powershell
+        run: |
+          # Locate the installed python.exe
+          $pythonExe = (Get-Command python.exe).Source
+          $pythonDir = Split-Path $pythonExe -Parent
+          Write-Host "Python directory: $pythonDir"
+          
+          # Copy python.exe to python3.exe
+          Copy-Item "$pythonDir\python.exe" "$pythonDir\python3.exe" -Force
+          
+          # Prepend the directory to PATH (highest priority)
+          echo "::prepend-path::$pythonDir"
+
+      - name: Install MSYS2
+        shell: powershell
+        run: |
+          choco install msys2 -y
+
+      - name: Download and extract OpenCV
+        shell: powershell
+        run: |
+          $zipUrl = "https://github.com/Silverlan/opencv-3.4.10-winx64/releases/download/v3.4.10/opencv-3.4.10-winx64.zip"
+          $zipFile = "$env:TEMP\opencv.zip"
+          Write-Host "Downloading OpenCV from $zipUrl..."
+          Invoke-WebRequest -Uri $zipUrl -OutFile $zipFile
+          $dest = "$env:USERPROFILE\opencv"
+          Write-Host "Extracting to $dest..."
+          Expand-Archive -Path $zipFile -DestinationPath $dest -Force
