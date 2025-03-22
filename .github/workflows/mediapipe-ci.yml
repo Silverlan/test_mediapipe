@@ -21,6 +21,11 @@ jobs:
           [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
           iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
+      - name: Uninstall existing Bazel
+        shell: powershell
+        run: |
+          choco uninstall bazel -y || Write-Host "Bazel not installed, moving on"
+
       - name: Install Bazel 6.4.0
         shell: powershell
         run: |
