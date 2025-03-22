@@ -1,4 +1,4 @@
-name: Setup Environment
+name: Build Mediapipe - Linux
 
 on:
   push:
@@ -44,11 +44,10 @@ jobs:
         shell: bash
         run: |
           # Install distutils
-          python3 -m ensurepip --default-pip
-          python3 -m pip install --upgrade setuptools
+          sudo apt install python3-setuptools
 
           # Install numpy
-          python -m pip install numpy
+          sudo apt install python3-numpy
 
       - name: Build
         shell: bash
