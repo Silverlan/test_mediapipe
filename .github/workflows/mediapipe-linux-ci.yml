@@ -33,9 +33,18 @@ jobs:
           # Can use mesa GPU libraries for desktop, (or Nvidia/AMD equivalent).
           sudo apt-get install mesa-common-dev libegl1-mesa-dev libgles2-mesa-dev
 
+      - name: Clone Mediapipe
+        shell: powershell
+        run: |
+          git clone https://github.com/Silverlan/mediapipe.git
+          cd mediapipe
+          git checkout f0fd8a7
+
       - name: Build
         shell: bash
         run: |
+          cd mediapipe
+
           # Requires a GPU with EGL driver support.
           # Can use mesa GPU libraries for desktop, (or Nvidia/AMD equivalent).
           sudo apt-get install mesa-common-dev libegl1-mesa-dev libgles2-mesa-dev
