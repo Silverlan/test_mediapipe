@@ -41,19 +41,19 @@ jobs:
         with:
           python-version: '3.12.0' 
 
-      - name: Copy python.exe to python3.exe and add to PATH with highest priority
-        shell: powershell
-        run: |
-          # Locate the installed python.exe
-          $pythonExe = (Get-Command python.exe).Source
-          $pythonDir = Split-Path $pythonExe -Parent
-          Write-Host "Python directory: $pythonDir"
-          
-          # Copy python.exe to python3.exe
-          Copy-Item "$pythonDir\python.exe" "$pythonDir\python3.exe" -Force
-          
-          # Prepend the directory to PATH (highest priority)
-          echo "::prepend-path::$pythonDir"
+      #- name: Copy python.exe to python3.exe and add to PATH with highest priority
+      #  shell: powershell
+      #  run: |
+      #    # Locate the installed python.exe
+      #    $pythonExe = (Get-Command python.exe).Source
+      #    $pythonDir = Split-Path $pythonExe -Parent
+      #    Write-Host "Python directory: $pythonDir"
+      #    
+      #    # Copy python.exe to python3.exe
+      #    Copy-Item "$pythonDir\python.exe" "$pythonDir\python3.exe" -Force
+      #    
+      #    # Prepend the directory to PATH (highest priority)
+      #    echo "::prepend-path::$pythonDir"
 
       - name: Install MSYS2
         shell: powershell
