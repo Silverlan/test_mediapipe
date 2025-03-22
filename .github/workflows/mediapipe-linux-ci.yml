@@ -1,0 +1,54 @@
+name: Setup Environment
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install OpenCV
+        shell: bash
+        run: |
+          sudo apt-get install -y \
+              libopencv-core-dev \
+              libopencv-highgui-dev \
+              libopencv-calib3d-dev \
+              libopencv-features2d-dev \
+              libopencv-imgproc-dev \
+              libopencv-video-dev
+          sudo apt-get install -y libopencv-contrib-dev
+
+      - name: Desktop example prerequisites
+        shell: bash
+        run: |
+          # Requires a GPU with EGL driver support.
+          # Can use mesa GPU libraries for desktop, (or Nvidia/AMD equivalent).
+          sudo apt-get install mesa-common-dev libegl1-mesa-dev libgles2-mesa-dev
+
+      - name: Build
+        shell: bash
+        run: |
+          # Requires a GPU with EGL driver support.
+          # Can use mesa GPU libraries for desktop, (or Nvidia/AMD equivalent).
+          sudo apt-get install mesa-common-dev libegl1-mesa-dev libgles2-mesa-dev
+          export GLOG_logtostderr=1
+
+          # if you are running on Linux desktop with CPU only
+          bazel run --define MEDIAPIPE_DISABLE_GPU=1 \
+              mediapipe/examples/desktop/hello_world:hello_world
+
+          # If you are running on Linux desktop with GPU support enabled (via mesa drivers)
+          bazel run --copt -DMESA_EGL_NO_X11_HEADERS --copt -DEGL_NO_X11 \
+              mediapipe/examples/desktop/hello_world:hello_world
+
+      - name: Handle Error
+        uses: Silverlan/common_actions/action_handle_error@main
+        if: failure()
