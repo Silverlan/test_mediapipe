@@ -24,7 +24,12 @@ jobs:
       - name: Uninstall existing Bazel
         shell: powershell
         run: |
-          choco uninstall bazel -y || Write-Host "Bazel not installed, moving on"
+          try {
+            choco uninstall bazel -y
+          }
+          catch {
+            Write-Host "Bazel not installed, moving on"
+          }
 
       - name: Install Bazel 6.4.0
         shell: powershell
