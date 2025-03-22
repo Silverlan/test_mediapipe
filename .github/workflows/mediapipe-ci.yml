@@ -84,7 +84,7 @@ jobs:
           repository: Silverlan/mediapipe_pragma_wrapper
           token: ${{ secrets.PRAGMA_MEDIAPIPE_WRAPPER_ACCESS_TOKEN }}
           path: mediapipe_pragma_wrapper
-          ref: 1ebff5046f5e7e27891af24940867b442e8fcef4
+          ref: 461c91931ac64bcd67d32c1f3ca5ddd942e88ec1
 
       - name: Merge mediapipe_pragma_wrapper files
         shell: bash
