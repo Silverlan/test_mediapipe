@@ -40,6 +40,16 @@ jobs:
           cd mediapipe
           git checkout f0fd8a7
 
+      - name: Install Python Dependencies
+        shell: bash
+        run: |
+          # Install distutils
+          python3 -m ensurepip --default-pip
+          python3 -m pip install --upgrade setuptools
+
+          # Install numpy
+          python -m pip install numpy
+
       - name: Build
         shell: bash
         run: |
