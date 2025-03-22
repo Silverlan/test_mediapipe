@@ -36,10 +36,22 @@ jobs:
         run: |
           choco install bazel --version 6.4.0 -y
 
+      - name: Uninstall existing Python
+        shell: powershell
+        run: |
+          choco uninstall python -y --force
+          choco uninstall python3 -y --force
+          choco uninstall python312 -y --force
+          # Remove any remaining Python directories manually
+          Remove-Item -Recurse -Force "C:\Python312" -ErrorAction SilentlyContinue
+          Remove-Item -Recurse -Force "C:\Program Files\Python312" -ErrorAction SilentlyContinue
+          Remove-Item -Recurse -Force "$env:LOCALAPPDATA\Programs\Python" -ErrorAction SilentlyContinue
+          Remove-Item -Recurse -Force "$env:USERPROFILE\AppData\Local\Programs\Python" -ErrorAction SilentlyContinue
+
       - name: Install Python 3.12.0
         shell: powershell
         run: |
-          choco install python --version 3.12.0 -y
+          choco install python --version 3.12.0 -y --force
 
       - name: Copy python.exe to python3.exe and add to PATH with highest priority
         shell: powershell
