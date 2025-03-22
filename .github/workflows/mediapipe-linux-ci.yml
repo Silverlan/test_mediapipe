@@ -38,7 +38,20 @@ jobs:
         run: |
           git clone https://github.com/Silverlan/mediapipe.git
           cd mediapipe
-          git checkout f0fd8a7
+          git checkout 48e4c093a3c900efddc97fa739feef37c791fda2
+
+      - name: Clone mediapipe_pragma_wrapper
+        uses: actions/checkout@v3
+        with:
+          repository: Silverlan/mediapipe_pragma_wrapper
+          token: ${{ secrets.PRAGMA_MEDIAPIPE_WRAPPER_ACCESS_TOKEN }}
+          path: mediapipe_pragma_wrapper
+          ref: '1ebff50'
+
+      - name: Merge mediapipe_pragma_wrapper files
+        shell: bash
+        run: |
+          cp -rfa mediapipe_pragma_wrapper/. mediapipe/
 
       - name: Install Python Dependencies
         shell: bash
@@ -61,11 +74,11 @@ jobs:
 
           # if you are running on Linux desktop with CPU only
           bazel run --define MEDIAPIPE_DISABLE_GPU=1 \
-              mediapipe/examples/desktop/hello_world:hello_world
+              mediapipe/examples/desktop/mediapipe_pragma_wrapper:mediapipe_pragma_wrapper
 
           # If you are running on Linux desktop with GPU support enabled (via mesa drivers)
           bazel run --copt -DMESA_EGL_NO_X11_HEADERS --copt -DEGL_NO_X11 \
-              mediapipe/examples/desktop/hello_world:hello_world
+              mediapipe/examples/desktop/mediapipe_pragma_wrapper:mediapipe_pragma_wrapper
 
       - name: Handle Error
         uses: Silverlan/common_actions/action_handle_error@main

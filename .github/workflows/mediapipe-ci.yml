@@ -76,7 +76,20 @@ jobs:
         run: |
           git clone https://github.com/Silverlan/mediapipe.git
           cd mediapipe
-          git checkout f0fd8a7
+          git checkout 48e4c093a3c900efddc97fa739feef37c791fda2
+
+      - name: Clone mediapipe_pragma_wrapper
+        uses: actions/checkout@v3
+        with:
+          repository: Silverlan/mediapipe_pragma_wrapper
+          token: ${{ secrets.PRAGMA_MEDIAPIPE_WRAPPER_ACCESS_TOKEN }}
+          path: mediapipe_pragma_wrapper
+          ref: '1ebff50'
+
+      - name: Merge mediapipe_pragma_wrapper files
+        shell: bash
+        run: |
+          cp -rfa mediapipe_pragma_wrapper/. mediapipe/
 
       - name: Print All Files
         shell: powershell
@@ -104,7 +117,7 @@ jobs:
           $env:PYTHON_BIN_PATH = (Get-Command python3).Source -replace '\\', '/'
 
           pushd mediapipe
-          bazel.exe --output_user_root="$env:BAZEL_OUTPUT_ROOT" build -c opt --action_env=BAZEL_CXXOPTS="/std:c++20" --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/pose_tracking:pose_tracking_cpu --verbose_failures --experimental_cc_shared_library
+          bazel.exe --output_user_root="$env:BAZEL_OUTPUT_ROOT" build -c opt --action_env=BAZEL_CXXOPTS="/std:c++20" --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/mediapipe_pragma_wrapper:mediapipe_pragma_wrapper --verbose_failures --experimental_cc_shared_library
           popd
 
       - name: Handle Error
