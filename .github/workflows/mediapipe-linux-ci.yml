@@ -38,7 +38,7 @@ jobs:
         run: |
           git clone https://github.com/Silverlan/mediapipe.git
           cd mediapipe
-          git checkout 48e4c093a3c900efddc97fa739feef37c791fda2
+          git checkout 10c5d914da87f41c99a79cc1eaebc9c242925b98
 
       - name: Clone mediapipe_pragma_wrapper
         uses: actions/checkout@v3
