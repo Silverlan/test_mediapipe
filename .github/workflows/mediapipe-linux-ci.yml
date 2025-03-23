@@ -106,7 +106,7 @@ jobs:
           echo "Listing files in $additional_path:"
           ls "$additional_path" -R
 
-          echo "outputs.output-dir=$additional_path" >> $GITHUB_OUTPUT
+          echo "output-dir=$additional_path" >> $GITHUB_OUTPUT
 
       - name: Generate Release Files
         shell: bash
