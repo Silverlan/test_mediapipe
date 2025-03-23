@@ -144,7 +144,7 @@ jobs:
           cp "$mpw_dir/opencv_world3410.dll" release/
 
           asset_dir="$mpw_dir/execroot/mediapipe/bazel-out/x64_windows-opt/bin/mediapipe/tasks/testdata/vision"
-          asset_out_dir = "release/data/"
+          asset_out_dir="release/data/"
           cp "$asset_dir"/*.{tflite,task} "$asset_out_dir"
 
           zip -r binaries-win64.zip release

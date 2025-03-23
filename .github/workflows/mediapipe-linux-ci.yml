@@ -118,7 +118,7 @@ jobs:
           cp "$mpw_dir/libmediapipe_pragma_wrapper.so" release/
 
           asset_dir="$mpw_dir/libmediapipe_pragma_wrapper.so.runfiles/mediapipe/mediapipe/tasks/testdata/vision"
-          asset_out_dir = "release/data/"
+          asset_out_dir="release/data/"
           cp "$asset_dir"/*.{tflite,task} "$asset_out_dir"
 
           tar -czvf binaries-lin64.tar.gz -C release .
