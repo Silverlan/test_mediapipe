@@ -98,7 +98,7 @@ jobs:
           $env:PYTHON_BIN_PATH = (Get-Command python3).Source -replace '\\', '/'
 
           pushd mediapipe
-          bazel.exe --output_user_root="$env:BAZEL_OUTPUT_ROOT" build -c dbg --action_env=BAZEL_CXXOPTS="/std:c++20" --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/mediapipe_pragma_wrapper:mediapipe_pragma_wrapper --verbose_failures --experimental_cc_shared_library
+          bazel.exe --output_user_root="$env:BAZEL_OUTPUT_ROOT" build -c opt --action_env=BAZEL_CXXOPTS="/std:c++20" --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/mediapipe_pragma_wrapper:mediapipe_pragma_wrapper --verbose_failures --experimental_cc_shared_library
           popd
 
       - name: Get Bazel Output Directory
@@ -140,6 +140,8 @@ jobs:
           mpw_dir="$bazel_out_dir/execroot/mediapipe/bazel-out/x64_windows-opt/bin/mediapipe/examples/desktop/mediapipe_pragma_wrapper"
 
           cp "$mpw_dir/mediapipe_pragma_wrapper.dll" release/
+          cp "$mpw_dir/mediapipe_pragma_wrapper.if.lib" release/
+          cp "$mpw_dir/opencv_world3410.dll" release/
 
           asset_dir="$mpw_dir/execroot/mediapipe/bazel-out/x64_windows-opt/bin/mediapipe/tasks/testdata/vision"
           asset_out_dir = "release/data/"
@@ -153,6 +155,64 @@ jobs:
           tag: nightly
           token: ${{ secrets.GITHUB_TOKEN }}
           files: "binaries-win64.zip"
+
+
+
+
+      - name: Build Mediapipe Debug
+        shell: powershell
+        run: |
+          $env:BAZEL_SH="C:\msys64\usr\bin\bash.exe"
+          $env:BAZEL_OUTPUT_ROOT="C:/_bazel_dbg"
+          
+          if (-Not (Test-Path $env:BAZEL_OUTPUT_ROOT)) {
+            New-Item -ItemType Directory -Path $env:BAZEL_OUTPUT_ROOT | Out-Null
+          }
+
+          # Install distutils
+          python3 -m ensurepip --default-pip
+          python3 -m pip install --upgrade setuptools
+
+          # Install numpy
+          python -m pip install numpy
+
+          # Set Python path
+          $env:PYTHON_BIN_PATH = (Get-Command python3).Source -replace '\\', '/'
+
+          pushd mediapipe
+          bazel.exe --output_user_root="$env:BAZEL_OUTPUT_ROOT" build -c dbg --action_env=BAZEL_CXXOPTS="/std:c++20" --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/mediapipe_pragma_wrapper:mediapipe_pragma_wrapper --verbose_failures --experimental_cc_shared_library
+          popd
+
+      - name: Get Bazel Output Directory Debug
+        shell: bash
+        run: |
+          curDir=$(pwd)
+          bazelDir="C:/_bazel_dbg"
+
+          so_path=$(find "$bazelDir" -name "mediapipe_pragma_wrapper.dll" | head -n 1)
+
+          if [ -z "$so_path" ]; then
+            echo "File mediapipe_pragma_wrapper.dll not found in $bazelDir."
+            exit 1
+          fi
+
+          echo "Found mediapipe_pragma_wrapper.dll at: $so_path"
+
+          # Extract the top-level directory relative to curDir/_bazel_dbg where the .so file was found.
+          # This is done by removing the prefix "$curDir/_bazel_dbg/" from the file's path and taking the first directory element.
+          relative_path=${so_path#"$bazelDir/"}
+          top_level_dir=$(echo "$relative_path" | cut -d'/' -f1)
+
+          # Set the additional path variable to the directory: bazelDir/topLevelDirOfPathOfSoFile
+          additional_path="$bazelDir/$top_level_dir"
+
+          echo "Additional path: $additional_path"
+
+          # List all files within the additional directory
+          echo "Listing files in $additional_path:"
+          ls "$additional_path" -R
+
+          echo "output-dir=$additional_path" >> $GITHUB_OUTPUT
 
       - name: Handle Error
         uses: Silverlan/common_actions/action_handle_error@main
