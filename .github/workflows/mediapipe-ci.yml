@@ -119,11 +119,12 @@ jobs:
         shell: bash
         run: |
           curDir=$(pwd)
+          bazelDir="C:/_bazel"
 
-          so_path=$(find "$curDir/_bazel" -name "mediapipe_pragma_wrapper.dll" | head -n 1)
+          so_path=$(find "$bazelDir" -name "mediapipe_pragma_wrapper.dll" | head -n 1)
 
           if [ -z "$so_path" ]; then
-            echo "File mediapipe_pragma_wrapper.dll not found in $curDir/_bazel."
+            echo "File mediapipe_pragma_wrapper.dll not found in $bazelDir."
             exit 1
           fi
 
@@ -131,11 +132,11 @@ jobs:
 
           # Extract the top-level directory relative to curDir/_bazel where the .so file was found.
           # This is done by removing the prefix "$curDir/_bazel/" from the file's path and taking the first directory element.
-          relative_path=${so_path#"$curDir/_bazel/"}
+          relative_path=${so_path#"$bazelDir/"}
           top_level_dir=$(echo "$relative_path" | cut -d'/' -f1)
 
-          # Set the additional path variable to the directory: curDir/_bazel/topLevelDirOfPathOfSoFile
-          additional_path="$curDir/_bazel/$top_level_dir"
+          # Set the additional path variable to the directory: bazelDir/topLevelDirOfPathOfSoFile
+          additional_path="$bazelDir/$top_level_dir"
 
           echo "Additional path: $additional_path"
 
