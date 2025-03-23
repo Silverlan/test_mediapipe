@@ -144,7 +144,7 @@ jobs:
           cp "$mpw_dir/mediapipe_pragma_wrapper.if.lib" release/
           cp "$mpw_dir/opencv_world3410.dll" release/
 
-          asset_dir="$mpw_dir/execroot/mediapipe/bazel-out/x64_windows-opt/bin/mediapipe/tasks/testdata/vision"
+          asset_dir="$bazel_out_dir/execroot/mediapipe/bazel-out/x64_windows-opt/bin/mediapipe/tasks/testdata/vision"
           asset_out_dir="release/data/"
           cp "$asset_dir"/*.{tflite,task} "$asset_out_dir"
 
