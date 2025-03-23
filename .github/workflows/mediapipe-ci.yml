@@ -141,7 +141,7 @@ jobs:
 
           # List all files within the additional directory
           echo "Listing files in $additional_path:"
-          ls "$additional_path"
+          ls "$additional_path" -R
 
       #- name: Publish Release
       #  uses: Silverlan/Releaser/releaser/composite@main
