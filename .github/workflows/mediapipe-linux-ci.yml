@@ -77,14 +77,33 @@ jobs:
           bazel --output_user_root="$bazel_output_root" build --define MEDIAPIPE_DISABLE_GPU=1 \
               mediapipe/examples/desktop/mediapipe_pragma_wrapper:mediapipe_pragma_wrapper
 
-      - name: Generate Release Files
+      - name: Get Bazel Output Directory
         shell: bash
         run: |
-          # Get the Bazel binary output directory.
-          cd mediapipe
-          output_dir=$(bazel info bazel-bin)
-          cd $output_dir
-          ls -R
+          curDir=$(pwd)
+
+          so_path=$(find "$curDir/_bazel" -name "libmediapipe_pragma_wrapper.so" | head -n 1)
+
+          if [ -z "$so_path" ]; then
+            echo "File libmediapipe_pragma_wrapper.so not found in $curDir/_bazel."
+            exit 1
+          fi
+
+          echo "Found libmediapipe_pragma_wrapper.so at: $so_path"
+
+          # Extract the top-level directory relative to curDir/_bazel where the .so file was found.
+          # This is done by removing the prefix "$curDir/_bazel/" from the file's path and taking the first directory element.
+          relative_path=${so_path#"$curDir/_bazel/"}
+          top_level_dir=$(echo "$relative_path" | cut -d'/' -f1)
+
+          # Set the additional path variable to the directory: curDir/_bazel/topLevelDirOfPathOfSoFile
+          additional_path="$curDir/_bazel/$top_level_dir"
+
+          echo "Additional path: $additional_path"
+
+          # List all files within the additional directory
+          echo "Listing files in $additional_path:"
+          ls "$additional_path"
 
       - name: Handle Error
         uses: Silverlan/common_actions/action_handle_error@main

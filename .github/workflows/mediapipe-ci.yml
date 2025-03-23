@@ -115,14 +115,33 @@ jobs:
           bazel.exe --output_user_root="$env:BAZEL_OUTPUT_ROOT" build -c opt --action_env=BAZEL_CXXOPTS="/std:c++20" --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/mediapipe_pragma_wrapper:mediapipe_pragma_wrapper --verbose_failures --experimental_cc_shared_library
           popd
 
-      - name: Generate Release Files
+      - name: Get Bazel Output Directory
         shell: bash
         run: |
-          # Get the Bazel binary output directory.
-          cd mediapipe
-          output_dir=$(bazel info bazel-bin)
-          cd $output_dir
-          ls -R
+          curDir=$(pwd)
+
+          so_path=$(find "$curDir/_bazel" -name "mediapipe_pragma_wrapper.dll" | head -n 1)
+
+          if [ -z "$so_path" ]; then
+            echo "File mediapipe_pragma_wrapper.dll not found in $curDir/_bazel."
+            exit 1
+          fi
+
+          echo "Found mediapipe_pragma_wrapper.dll at: $so_path"
+
+          # Extract the top-level directory relative to curDir/_bazel where the .so file was found.
+          # This is done by removing the prefix "$curDir/_bazel/" from the file's path and taking the first directory element.
+          relative_path=${so_path#"$curDir/_bazel/"}
+          top_level_dir=$(echo "$relative_path" | cut -d'/' -f1)
+
+          # Set the additional path variable to the directory: curDir/_bazel/topLevelDirOfPathOfSoFile
+          additional_path="$curDir/_bazel/$top_level_dir"
+
+          echo "Additional path: $additional_path"
+
+          # List all files within the additional directory
+          echo "Listing files in $additional_path:"
+          ls "$additional_path"
 
       #- name: Publish Release
       #  uses: Silverlan/Releaser/releaser/composite@main
