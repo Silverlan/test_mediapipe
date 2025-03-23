@@ -36,14 +36,6 @@ jobs:
         run: |
           choco install bazel --version 6.4.0 -y
 
-      - name: Test
-        shell: bash
-        run: |
-          # Get the Bazel binary output directory.
-          output_dir=$(bazel info bazel-bin)
-          cd $output_dir
-          ls -R
-
       - name: Install Python 3.12.0
         uses: actions/setup-python@v5
         with:
@@ -127,6 +119,7 @@ jobs:
         shell: bash
         run: |
           # Get the Bazel binary output directory.
+          cd mediapipe
           output_dir=$(bazel info bazel-bin)
           cd $output_dir
           ls -R

@@ -62,14 +62,6 @@ jobs:
           # Install numpy
           sudo apt install python3-numpy
 
-      - name: Test
-        shell: bash
-        run: |
-          # Get the Bazel binary output directory.
-          output_dir=$(bazel info bazel-bin)
-          cd $output_dir
-          ls -R
-
       - name: Build
         shell: bash
         run: |
@@ -89,6 +81,7 @@ jobs:
         shell: bash
         run: |
           # Get the Bazel binary output directory.
+          cd mediapipe
           output_dir=$(bazel info bazel-bin)
           cd $output_dir
           ls -R
