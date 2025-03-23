@@ -76,7 +76,7 @@ jobs:
         run: |
           git clone https://github.com/Silverlan/mediapipe.git
           cd mediapipe
-          git checkout 394db9978b412731322a5ca4cec91d49603e2453
+          git checkout 9ea1acfd70ae0679c05c6c44871a4be5abc16ad7
 
       - name: Clone mediapipe_pragma_wrapper
         uses: actions/checkout@v3
@@ -84,17 +84,12 @@ jobs:
           repository: Silverlan/mediapipe_pragma_wrapper
           token: ${{ secrets.PRAGMA_MEDIAPIPE_WRAPPER_ACCESS_TOKEN }}
           path: mediapipe_pragma_wrapper
-          ref: 461c91931ac64bcd67d32c1f3ca5ddd942e88ec1
+          ref: 706bb851bab9e0b54ce2113a9a236f5fecab30c4
 
       - name: Merge mediapipe_pragma_wrapper files
         shell: bash
         run: |
           cp -rfa mediapipe_pragma_wrapper/. mediapipe/
-
-      - name: Print All Files
-        shell: powershell
-        run: |
-          Get-ChildItem -Recurse | ForEach-Object { Write-Host $_.FullName }
 
       - name: Build Mediapipe
         shell: powershell
@@ -119,6 +114,18 @@ jobs:
           pushd mediapipe
           bazel.exe --output_user_root="$env:BAZEL_OUTPUT_ROOT" build -c opt --action_env=BAZEL_CXXOPTS="/std:c++20" --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/mediapipe_pragma_wrapper:mediapipe_pragma_wrapper --verbose_failures --experimental_cc_shared_library
           popd
+
+      - name: Generate Release Files
+        shell: bash
+        run: |
+          ls -R
+
+      #- name: Publish Release
+      #  uses: Silverlan/Releaser/releaser/composite@main
+      #  with:
+      #    tag: nightly
+      #    token: ${{ secrets.GITHUB_TOKEN }}
+      #    files: "pragma-win64.zip"
 
       - name: Handle Error
         uses: Silverlan/common_actions/action_handle_error@main

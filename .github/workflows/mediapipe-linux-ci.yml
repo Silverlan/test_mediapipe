@@ -38,7 +38,7 @@ jobs:
         run: |
           git clone https://github.com/Silverlan/mediapipe.git
           cd mediapipe
-          git checkout 394db9978b412731322a5ca4cec91d49603e2453
+          git checkout 9ea1acfd70ae0679c05c6c44871a4be5abc16ad7
 
       - name: Clone mediapipe_pragma_wrapper
         uses: actions/checkout@v3
@@ -46,7 +46,7 @@ jobs:
           repository: Silverlan/mediapipe_pragma_wrapper
           token: ${{ secrets.PRAGMA_MEDIAPIPE_WRAPPER_ACCESS_TOKEN }}
           path: mediapipe_pragma_wrapper
-          ref: 461c91931ac64bcd67d32c1f3ca5ddd942e88ec1
+          ref: 706bb851bab9e0b54ce2113a9a236f5fecab30c4
 
       - name: Merge mediapipe_pragma_wrapper files
         shell: bash
@@ -79,6 +79,11 @@ jobs:
           # If you are running on Linux desktop with GPU support enabled (via mesa drivers)
           bazel run --copt -DMESA_EGL_NO_X11_HEADERS --copt -DEGL_NO_X11 \
               mediapipe/examples/desktop/mediapipe_pragma_wrapper:mediapipe_pragma_wrapper
+
+      - name: Generate Release Files
+        shell: bash
+        run: |
+          ls -R
 
       - name: Handle Error
         uses: Silverlan/common_actions/action_handle_error@main
