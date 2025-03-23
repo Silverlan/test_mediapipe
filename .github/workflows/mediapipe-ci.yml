@@ -103,6 +103,7 @@ jobs:
 
       - name: Get Bazel Output Directory
         shell: bash
+        id: get-bazel-output-dir
         run: |
           curDir=$(pwd)
           bazelDir="C:/_bazel"
