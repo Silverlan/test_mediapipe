@@ -121,14 +121,14 @@ jobs:
           asset_out_dir="release/data/"
           cp "$asset_dir"/*.{tflite,task} "$asset_out_dir"
 
-          tar -czvf binaries-lin64.tar.gz -C release .
+          tar -czvf binaries_linux64.tar.gz -C release .
 
       - name: Publish Release
         uses: Silverlan/Releaser/releaser/composite@main
         with:
           tag: nightly
           token: ${{ secrets.GITHUB_TOKEN }}
-          files: "binaries-lin64.tar.gz"
+          files: "binaries_linux64.tar.gz"
 
       - name: Handle Error
         uses: Silverlan/common_actions/action_handle_error@main

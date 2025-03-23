@@ -148,14 +148,14 @@ jobs:
           asset_out_dir="release/data/"
           cp "$asset_dir"/*.{tflite,task} "$asset_out_dir"
 
-          zip -r binaries-win64.zip release
+          7z a binaries_windows64 "release/**"
 
       - name: Publish Release
         uses: Silverlan/Releaser/releaser/composite@main
         with:
           tag: nightly
           token: ${{ secrets.GITHUB_TOKEN }}
-          files: "binaries-win64.zip"
+          files: "binaries_windows64.zip"
 
 
 
