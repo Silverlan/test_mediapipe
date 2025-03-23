@@ -41,20 +41,6 @@ jobs:
         with:
           python-version: '3.12.0' 
 
-      #- name: Copy python.exe to python3.exe and add to PATH with highest priority
-      #  shell: powershell
-      #  run: |
-      #    # Locate the installed python.exe
-      #    $pythonExe = (Get-Command python.exe).Source
-      #    $pythonDir = Split-Path $pythonExe -Parent
-      #    Write-Host "Python directory: $pythonDir"
-      #    
-      #    # Copy python.exe to python3.exe
-      #    Copy-Item "$pythonDir\python.exe" "$pythonDir\python3.exe" -Force
-      #    
-      #    # Prepend the directory to PATH (highest priority)
-      #    echo "::prepend-path::$pythonDir"
-
       - name: Install MSYS2
         shell: powershell
         run: |
@@ -112,7 +98,7 @@ jobs:
           $env:PYTHON_BIN_PATH = (Get-Command python3).Source -replace '\\', '/'
 
           pushd mediapipe
-          bazel.exe --output_user_root="$env:BAZEL_OUTPUT_ROOT" build -c opt --action_env=BAZEL_CXXOPTS="/std:c++20" --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/mediapipe_pragma_wrapper:mediapipe_pragma_wrapper --verbose_failures --experimental_cc_shared_library
+          bazel.exe --output_user_root="$env:BAZEL_OUTPUT_ROOT" build -c dbg --action_env=BAZEL_CXXOPTS="/std:c++20" --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/mediapipe_pragma_wrapper:mediapipe_pragma_wrapper --verbose_failures --experimental_cc_shared_library
           popd
 
       - name: Get Bazel Output Directory
@@ -144,12 +130,29 @@ jobs:
           echo "Listing files in $additional_path:"
           ls "$additional_path" -R
 
-      #- name: Publish Release
-      #  uses: Silverlan/Releaser/releaser/composite@main
-      #  with:
-      #    tag: nightly
-      #    token: ${{ secrets.GITHUB_TOKEN }}
-      #    files: "pragma-win64.zip"
+          echo "output-dir=$additional_path" >> $GITHUB_OUTPUT
+
+      - name: Generate Release Files
+        shell: bash
+        run: |
+          mkdir -p release/data
+          bazel_out_dir="${{ steps.get-bazel-output-dir.outputs.output-dir }}"
+          mpw_dir="$bazel_out_dir/execroot/mediapipe/bazel-out/x64_windows-opt/bin/mediapipe/examples/desktop/mediapipe_pragma_wrapper"
+
+          cp "$mpw_dir/mediapipe_pragma_wrapper.dll" release/
+
+          asset_dir="$mpw_dir/execroot/mediapipe/bazel-out/x64_windows-opt/bin/mediapipe/tasks/testdata/vision"
+          asset_out_dir = "release/data/"
+          cp "$asset_dir"/*.{tflite,task} "$asset_out_dir"
+
+          zip -r binaries-win64.zip release
+
+      - name: Publish Release
+        uses: Silverlan/Releaser/releaser/composite@main
+        with:
+          tag: nightly
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: "binaries-win64.zip"
 
       - name: Handle Error
         uses: Silverlan/common_actions/action_handle_error@main

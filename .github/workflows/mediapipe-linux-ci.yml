@@ -111,21 +111,15 @@ jobs:
       - name: Generate Release Files
         shell: bash
         run: |
-          mkdir -p release
+          mkdir -p release/data
           bazel_out_dir="${{ steps.get-bazel-output-dir.outputs.output-dir }}"
           mpw_dir="$bazel_out_dir/execroot/mediapipe/bazel-out/k8-fastbuild/bin/mediapipe/examples/desktop/mediapipe_pragma_wrapper"
 
           cp "$mpw_dir/libmediapipe_pragma_wrapper.so" release/
 
           asset_dir="$mpw_dir/libmediapipe_pragma_wrapper.so.runfiles/mediapipe/mediapipe/tasks/testdata/vision"
-          cp "$asset_dir/face_detection_short_range.tflite" release/
-          cp "$asset_dir/hand_landmark_full.tflite" release/
-          cp "$asset_dir/hand_landmarker.task" release/
-          cp "$asset_dir/handrecrop_2020_07_21_v0.f16.tflite" release/
-          cp "$asset_dir/holistic_landmarker.task" release/
-          cp "$asset_dir/pose_detection.tflite" release/
-          cp "$asset_dir/pose_landmark_lite.tflite" release/
-          cp "$asset_dir/pose_landmarker.task" release/
+          asset_out_dir = "release/data/"
+          cp "$asset_dir"/*.{tflite,task} "$asset_out_dir"
 
           tar -czvf binaries-lin64.tar.gz -C release .
 
