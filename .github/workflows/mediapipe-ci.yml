@@ -148,7 +148,7 @@ jobs:
           asset_out_dir="release/data/"
           cp "$asset_dir"/*.{tflite,task} "$asset_out_dir"
 
-          7z a binaries_windows64.zip "release/**"
+          7z a binaries_windows64.zip "release\*"
 
       - name: Publish Release
         uses: Silverlan/Releaser/releaser/composite@main
@@ -186,6 +186,7 @@ jobs:
 
       - name: Get Bazel Output Directory Debug
         shell: bash
+        id: get-bazel-dbg-output-dir
         run: |
           curDir=$(pwd)
           bazelDir="C:/_bazel_dbg"
@@ -214,6 +215,32 @@ jobs:
           ls "$additional_path" -R
 
           echo "output-dir=$additional_path" >> $GITHUB_OUTPUT
+
+      - name: Generate Debug Release Files
+        shell: bash
+        run: |
+          rm -rf release/*
+          mkdir -p release/data
+          bazel_out_dir="${{ steps.get-bazel-dbg-output-dir.outputs.output-dir }}"
+          mpw_dir="$bazel_out_dir/execroot/mediapipe/bazel-out/x64_windows-dbg/bin/mediapipe/examples/desktop/mediapipe_pragma_wrapper"
+
+          cp "$mpw_dir/mediapipe_pragma_wrapper.dll" release/
+          cp "$mpw_dir/mediapipe_pragma_wrapper.if.lib" release/
+          cp "$mpw_dir/mediapipe_pragma_wrapper.pdb" release/
+          cp "$mpw_dir/opencv_world3410d.dll" release/
+
+          asset_dir="$bazel_out_dir/execroot/mediapipe/bazel-out/x64_windows-dbg/bin/mediapipe/tasks/testdata/vision"
+          asset_out_dir="release/data/"
+          cp "$asset_dir"/*.{tflite,task} "$asset_out_dir"
+
+          7z a binaries_windows64_dbg.zip "release\*"
+
+      - name: Publish Debug Release
+        uses: Silverlan/Releaser/releaser/composite@main
+        with:
+          tag: nightly
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: "binaries_windows64_dbg.zip"
 
       - name: Handle Error
         uses: Silverlan/common_actions/action_handle_error@main
