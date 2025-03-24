@@ -148,7 +148,8 @@ jobs:
           asset_out_dir="release/data/"
           cp "$asset_dir"/*.{tflite,task} "$asset_out_dir"
 
-          7z a binaries_windows64.zip "release\*"
+          cd release
+          7z a ../binaries_windows64.zip *
 
       - name: Publish Release
         uses: Silverlan/Releaser/releaser/composite@main
@@ -233,7 +234,8 @@ jobs:
           asset_out_dir="release/data/"
           cp "$asset_dir"/*.{tflite,task} "$asset_out_dir"
 
-          7z a binaries_windows64_dbg.zip "release\*"
+          cd release
+          7z a ../binaries_windows64_dbg.zip *
 
       - name: Publish Debug Release
         uses: Silverlan/Releaser/releaser/composite@main
